@@ -17,7 +17,7 @@ API REST desarrollada en Spring Boot para la gestión de citas médicas. Permite
 
 1. Crear la base de datos o importar el archivo `citas_medicas.sql`
 
-2. Ejecutar la aplicación:
+2. Ejecutar la aplicación con Maven:
 ```bash
 mvn spring-boot:run
 ```
