@@ -26,11 +26,3 @@ mvn spring-boot:run
 ```
 http://localhost:8080/index.html
 ```
-
-## Estructura del Proyecto
-
-- `model/` - Entidades: Paciente, Medico, Especialidad, Consultorio, Cita, HorarioMedico
-- `repository/` - Repositorios con consultas JPQL
-- `service/` - Lógica de negocio con transacciones
-- `controller/` - Endpoints REST
-- `static/` - Frontend HTML
