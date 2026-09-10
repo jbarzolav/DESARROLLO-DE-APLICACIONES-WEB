@@ -15,10 +15,7 @@ API REST desarrollada en Spring Boot para la gestión de citas médicas. Permite
 
 ## Cómo Ejecutar
 
-1. Iniciar XAMPP y crear la base de datos:
-```sql
-CREATE DATABASE citas_medicas;
-```
+1. Crear la base de datos o importar el archivo `citas_medicas.sql`
 
 2. Ejecutar la aplicación:
 ```bash
