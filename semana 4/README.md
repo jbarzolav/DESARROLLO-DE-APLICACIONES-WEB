@@ -1,4 +1,4 @@
-# Sistema de Citas Médicas
+# Módulo de Citas Médicas
 
 API REST desarrollada en Spring Boot para el manage de citas médicas.
 
