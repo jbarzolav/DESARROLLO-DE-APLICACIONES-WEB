@@ -60,7 +60,7 @@
 <body>
     <div class="header">
         <h1>Sistema de Citas Médicas</h1>
-        <p>RF-CIT-01, 03, 04, 05, 06, 07, 17, 18</p>
+        <p>Gestión de Citas Médicas</p>
     </div>
     <div class="container">
         <div class="tabs">
@@ -68,11 +68,11 @@
             <button class="tab" onclick="mostrarPanel('especialidades', this)">Especialidades</button>
             <button class="tab" onclick="mostrarPanel('consultorios', this)">Consultorios</button>
             <button class="tab" onclick="mostrarPanel('medicos', this)">Médicos</button>
-            <button class="tab" onclick="mostrarPanel('horarios', this)">RF-06 Horarios</button>
-            <button class="tab" onclick="mostrarPanel('citas', this)">RF-01 Citas</button>
-            <button class="tab" onclick="mostrarPanel('agenda', this)">RF-07 Agenda</button>
-            <button class="tab" onclick="mostrarPanel('buscar', this)">RF-17 Buscar</button>
-            <button class="tab" onclick="mostrarPanel('historial', this)">RF-18 Historial</button>
+            <button class="tab" onclick="mostrarPanel('horarios', this)">Horarios</button>
+            <button class="tab" onclick="mostrarPanel('citas', this)">Citas</button>
+            <button class="tab" onclick="mostrarPanel('agenda', this)">Agenda</button>
+            <button class="tab" onclick="mostrarPanel('buscar', this)">Buscar</button>
+            <button class="tab" onclick="mostrarPanel('historial', this)">Historial</button>
         </div>
 
         <div id="pacientes" class="panel active">
@@ -167,7 +167,7 @@
         </div>
 
         <div id="horarios" class="panel">
-            <h2 class="title">RF-CIT-06: Configurar Horarios Médicos</h2>
+            <h2 class="title">Configurar Horarios Médicos</h2>
             <div id="msg-horarios"></div>
             <div class="form-grid">
                 <div class="form-group"><label>Médico</label><select id="h-medico"></select></div>
@@ -191,7 +191,7 @@
         </div>
 
         <div id="citas" class="panel">
-            <h2 class="title">RF-CIT-01: Registrar Citas Médicas</h2>
+            <h2 class="title">Registrar Citas Médicas</h2>
             <div id="msg-citas"></div>
             <div class="form-grid">
                 <div class="form-group"><label>Paciente *</label><select id="ci-paciente"></select></div>
@@ -220,7 +220,7 @@
         </div>
 
         <div id="agenda" class="panel">
-            <h2 class="title">RF-CIT-07: Mostrar Agenda Médica</h2>
+            <h2 class="title">Mostrar Agenda Médica</h2>
             <div id="msg-agenda"></div>
             <div class="search-box">
                 <div class="form-group"><label>Médico</label><select id="a-medico"></select></div>
@@ -236,7 +236,7 @@
         </div>
 
         <div id="buscar" class="panel">
-            <h2 class="title">RF-CIT-17: Buscar Citas</h2>
+            <h2 class="title">Buscar Citas</h2>
             <div id="msg-buscar"></div>
             <div class="search-box">
                 <div class="form-group"><label>Código</label><input type="text" id="bus-codigo"></div>
@@ -260,7 +260,7 @@
         </div>
 
         <div id="historial" class="panel">
-            <h2 class="title">RF-CIT-18: Historial de Citas del Paciente</h2>
+            <h2 class="title">Historial de Citas del Paciente</h2>
             <div id="msg-historial"></div>
             <div class="search-box">
                 <div class="form-group"><label>ID Paciente</label><input type="number" id="hist-id"></div>
