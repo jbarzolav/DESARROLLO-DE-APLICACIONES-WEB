@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Citas Médicas - 8 Requerimientos</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: #f0f2f5; min-height: 100vh; }
+        .header { background: linear-gradient(135deg, #1e40af, #7c3aed); color: white; padding: 20px; text-align: center; }
+        .header h1 { font-size: 22px; }
+        .header p { font-size: 13px; opacity: 0.9; margin-top: 4px; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 20px; }
+        .tabs { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; }
+        .tab { padding: 10px 16px; border: none; background: white; border-radius: 8px; cursor: pointer; font-size: 12px; font-weight: 600; box-shadow: 0 2px 4px rgba(0,0,0,0.1); transition: all 0.2s; }
+        .tab.active { background: #1e40af; color: white; }
+        .tab:hover { background: #e5e7eb; }
+        .tab.active:hover { background: #1d4ed8; }
+        .panel { display: none; background: white; border-radius: 12px; padding: 24px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        .panel.active { display: block; }
+        .form-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 16px; }
+        .form-grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 16px; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-group label { font-weight: 600; font-size: 12px; color: #374151; }
+        .form-group input, .form-group select { padding: 9px 10px; border: 1px solid #d1d5db; border-radius: 6px; font-size: 13px; width: 100%; }
+        .form-group input:focus, .form-group select:focus { outline: none; border-color: #1e40af; box-shadow: 0 0 0 2px rgba(30,64,175,0.1); }
+        .btn { padding: 9px 16px; border: none; border-radius: 6px; cursor: pointer; font-size: 13px; font-weight: 600; }
+        .btn-primary { background: #1e40af; color: white; }
+        .btn-primary:hover { background: #1d4ed8; }
+        .btn-success { background: #16a34a; color: white; }
+        .btn-success:hover { background: #15803d; }
+        .btn-warning { background: #f59e0b; color: white; }
+        .btn-warning:hover { background: #d97706; }
+        .btn-danger { background: #dc2626; color: white; font-size: 11px; padding: 5px 10px; }
+        .btn-danger:hover { background: #b91c1c; }
+        .btn-editar { background: #f59e0b; color: white; font-size: 11px; padding: 5px 10px; }
+        .btn-editar:hover { background: #d97706; }
+        .btn-group { display: flex; gap: 8px; margin-top: 8px; }
+        .msg { padding: 10px 14px; border-radius: 6px; margin-bottom: 14px; font-weight: 500; font-size: 13px; }
+        .msg-success { background: #dcfce7; color: #166534; border: 1px solid #bbf7d0; }
+        .msg-error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; }
+        .title { font-size: 16px; font-weight: 700; color: #1f2937; margin-bottom: 14px; }
+        .subtitle { font-size: 13px; color: #6b7280; margin-bottom: 12px; font-weight: 600; }
+        hr { margin: 18px 0; border: none; border-top: 1px solid #e5e7eb; }
+        .tabla-container { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        th { background: #f9fafb; font-weight: 600; color: #374151; padding: 8px 6px; text-align: left; white-space: nowrap; }
+        td { padding: 8px 6px; border-bottom: 1px solid #e5e7eb; white-space: nowrap; }
+        tr:hover { background: #f9fafb; }
+        .badge { padding: 3px 8px; border-radius: 10px; font-size: 10px; font-weight: 600; display: inline-block; }
+        .badge-blue { background: #dbeafe; color: #1e40af; }
+        .badge-green { background: #dcfce7; color: #166534; }
+        .badge-red { background: #fef2f2; color: #991b1b; }
+        .badge-gray { background: #f3f4f6; color: #374151; }
+        .acciones { display: flex; gap: 3px; }
+        .search-box { display: flex; gap: 10px; margin-bottom: 14px; flex-wrap: wrap; align-items: flex-end; }
+        .search-box .form-group { flex: 1; min-width: 130px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Sistema de Citas Médicas</h1>
+        <p>RF-CIT-01, 03, 04, 05, 06, 07, 17, 18</p>
+    </div>
+    <div class="container">
+        <div class="tabs">
+            <button class="tab active" onclick="mostrarPanel('pacientes', this)">Pacientes</button>
+            <button class="tab" onclick="mostrarPanel('especialidades', this)">Especialidades</button>
+            <button class="tab" onclick="mostrarPanel('consultorios', this)">Consultorios</button>
+            <button class="tab" onclick="mostrarPanel('medicos', this)">Médicos</button>
+            <button class="tab" onclick="mostrarPanel('horarios', this)">RF-06 Horarios</button>
+            <button class="tab" onclick="mostrarPanel('citas', this)">RF-01 Citas</button>
+            <button class="tab" onclick="mostrarPanel('agenda', this)">RF-07 Agenda</button>
+            <button class="tab" onclick="mostrarPanel('buscar', this)">RF-17 Buscar</button>
+            <button class="tab" onclick="mostrarPanel('historial', this)">RF-18 Historial</button>
+        </div>
+
+        <div id="pacientes" class="panel active">
+            <h2 class="title">Pacientes</h2>
+            <div id="msg-pacientes"></div>
+            <div class="form-grid">
+                <div class="form-group"><label>Nombre</label><input type="text" id="p-nombre"></div>
+                <div class="form-group"><label>Apellido</label><input type="text" id="p-apellido"></div>
+                <div class="form-group"><label>DNI</label><input type="text" id="p-dni"></div>
+                <div class="form-group"><label>Teléfono</label><input type="text" id="p-telefono"></div>
+                <div class="form-group"><label>Email</label><input type="email" id="p-email"></div>
+            </div>
+            <input type="hidden" id="p-id">
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="guardarPaciente()">Guardar</button>
+                <button class="btn btn-warning" onclick="limpiarPaciente()">Limpiar</button>
+            </div>
+            <hr>
+            <div class="tabla-container">
+                <table>
+                    <thead><tr><th>ID</th><th>Nombre</th><th>Apellido</th><th>DNI</th><th>Teléfono</th><th>Email</th><th>Acciones</th></tr></thead>
+                    <tbody id="tabla-pacientes"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="especialidades" class="panel">
+            <h2 class="title">Especialidades</h2>
+            <div id="msg-especialidades"></div>
+            <div class="form-grid">
+                <div class="form-group"><label>Nombre</label><input type="text" id="e-nombre"></div>
+                <div class="form-group"><label>Descripción</label><input type="text" id="e-descripcion"></div>
+            </div>
+            <input type="hidden" id="e-id">
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="guardarEspecialidad()">Guardar</button>
+                <button class="btn btn-warning" onclick="limpiarEspecialidad()">Limpiar</button>
+            </div>
+            <hr>
+            <div class="tabla-container">
+                <table>
+                    <thead><tr><th>ID</th><th>Nombre</th><th>Descripción</th><th>Acciones</th></tr></thead>
+                    <tbody id="tabla-especialidades"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="consultorios" class="panel">
+            <h2 class="title">Consultorios</h2>
+            <div id="msg-consultorios"></div>
+            <div class="form-grid">
+                <div class="form-group"><label>Código</label><input type="text" id="c-codigo"></div>
+                <div class="form-group"><label>Nombre</label><input type="text" id="c-nombre"></div>
+                <div class="form-group"><label>Piso</label><input type="text" id="c-piso"></div>
+            </div>
+            <input type="hidden" id="c-id">
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="guardarConsultorio()">Guardar</button>
+                <button class="btn btn-warning" onclick="limpiarConsultorio()">Limpiar</button>
+            </div>
+            <hr>
+            <div class="tabla-container">
+                <table>
+                    <thead><tr><th>ID</th><th>Código</th><th>Nombre</th><th>Piso</th><th>Acciones</th></tr></thead>
+                    <tbody id="tabla-consultorios"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="medicos" class="panel">
+            <h2 class="title">Médicos</h2>
+            <div id="msg-medicos"></div>
+            <div class="form-grid">
+                <div class="form-group"><label>Nombre</label><input type="text" id="m-nombre"></div>
+                <div class="form-group"><label>Apellido</label><input type="text" id="m-apellido"></div>
+                <div class="form-group"><label>DNI</label><input type="text" id="m-dni"></div>
+                <div class="form-group"><label>Teléfono</label><input type="text" id="m-telefono"></div>
+                <div class="form-group"><label>Especialidad</label><select id="m-especialidad"></select></div>
+            </div>
+            <input type="hidden" id="m-id">
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="guardarMedico()">Guardar</button>
+                <button class="btn btn-warning" onclick="limpiarMedico()">Limpiar</button>
+            </div>
+            <hr>
+            <div class="tabla-container">
+                <table>
+                    <thead><tr><th>ID</th><th>Nombre</th><th>Apellido</th><th>DNI</th><th>Teléfono</th><th>Especialidad</th><th>Acciones</th></tr></thead>
+                    <tbody id="tabla-medicos"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="horarios" class="panel">
+            <h2 class="title">RF-CIT-06: Configurar Horarios Médicos</h2>
+            <div id="msg-horarios"></div>
+            <div class="form-grid">
+                <div class="form-group"><label>Médico</label><select id="h-medico"></select></div>
+                <div class="form-group"><label>Especialidad</label><select id="h-especialidad"></select></div>
+                <div class="form-group"><label>Día</label><select id="h-dia"><option>Lunes</option><option>Martes</option><option>Miércoles</option><option>Jueves</option><option>Viernes</option><option>Sábado</option></select></div>
+                <div class="form-group"><label>Hora Inicio</label><input type="time" id="h-inicio"></div>
+                <div class="form-group"><label>Hora Fin</label><input type="time" id="h-fin"></div>
+            </div>
+            <input type="hidden" id="h-id">
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="guardarHorario()">Guardar</button>
+                <button class="btn btn-warning" onclick="limpiarHorario()">Limpiar</button>
+            </div>
+            <hr>
+            <div class="tabla-container">
+                <table>
+                    <thead><tr><th>ID</th><th>Médico</th><th>Especialidad</th><th>Día</th><th>Inicio</th><th>Fin</th><th>Acciones</th></tr></thead>
+                    <tbody id="tabla-horarios"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="citas" class="panel">
+            <h2 class="title">RF-CIT-01: Registrar Citas Médicas</h2>
+            <div id="msg-citas"></div>
+            <div class="form-grid">
+                <div class="form-group"><label>Paciente *</label><select id="ci-paciente"></select></div>
+                <div class="form-group"><label>Especialidad *</label><select id="ci-especialidad"></select></div>
+                <div class="form-group"><label>Médico *</label><select id="ci-medico"></select></div>
+                <div class="form-group"><label>Consultorio *</label><select id="ci-consultorio"></select></div>
+                <div class="form-group"><label>Fecha *</label><input type="date" id="ci-fecha"></div>
+                <div class="form-group"><label>Hora *</label><input type="time" id="ci-hora"></div>
+                <div class="form-group"><label>Tipo Atención</label><select id="ci-tipo"><option>Consulta General</option><option>Control</option><option>Urgencia</option><option>Especialista</option></select></div>
+                <div class="form-group"><label>Motivo</label><input type="text" id="ci-motivo"></div>
+                <div class="form-group"><label>Observaciones</label><input type="text" id="ci-observaciones"></div>
+                <div class="form-group"><label>Estado</label><select id="ci-estado"><option value="PROGRAMADA">Programada</option><option value="CONFIRMADA">Confirmada</option><option value="CANCELADA">Cancelada</option><option value="ATENDIDA">Atendida</option><option value="NO_ASISTIO">No Asistió</option></select></div>
+            </div>
+            <input type="hidden" id="ci-id">
+            <div class="btn-group">
+                <button class="btn btn-primary" onclick="guardarCita()">Registrar Cita</button>
+                <button class="btn btn-warning" onclick="limpiarCita()">Limpiar</button>
+            </div>
+            <hr>
+            <div class="tabla-container">
+                <table>
+                    <thead><tr><th>ID</th><th>Código</th><th>Paciente</th><th>DNI</th><th>Especialidad</th><th>Médico</th><th>Consultorio</th><th>Fecha</th><th>Hora</th><th>Tipo</th><th>Motivo</th><th>Estado</th><th>Acciones</th></tr></thead>
+                    <tbody id="tabla-citas"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="agenda" class="panel">
+            <h2 class="title">RF-CIT-07: Mostrar Agenda Médica</h2>
+            <div id="msg-agenda"></div>
+            <div class="search-box">
+                <div class="form-group"><label>Médico</label><select id="a-medico"></select></div>
+                <div class="form-group"><label>Fecha</label><input type="date" id="a-fecha"></div>
+                <div class="form-group" style="justify-content:flex-end;"><button class="btn btn-success" onclick="buscarAgenda()">Buscar Agenda</button></div>
+            </div>
+            <div class="tabla-container">
+                <table>
+                    <thead><tr><th>Código</th><th>Paciente</th><th>Médico</th><th>Especialidad</th><th>Fecha</th><th>Hora</th><th>Estado</th></tr></thead>
+                    <tbody id="tabla-agenda"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="buscar" class="panel">
+            <h2 class="title">RF-CIT-17: Buscar Citas</h2>
+            <div id="msg-buscar"></div>
+            <div class="search-box">
+                <div class="form-group"><label>Código</label><input type="text" id="bus-codigo"></div>
+                <div class="form-group"><label>DNI Paciente</label><input type="text" id="bus-dni"></div>
+                <div class="form-group"><label>ID Médico</label><input type="number" id="bus-medico"></div>
+                <div class="form-group"><label>ID Especialidad</label><input type="number" id="bus-especialidad"></div>
+                <div class="form-group"><label>Estado</label><select id="bus-estado"><option value="">Todos</option><option value="PROGRAMADA">Programada</option><option value="CONFIRMADA">Confirmada</option><option value="CANCELADA">Cancelada</option><option value="ATENDIDA">Atendida</option><option value="NO_ASISTIO">No Asistió</option></select></div>
+            </div>
+            <div class="btn-group">
+                <button class="btn btn-success" onclick="buscarCitas()">Buscar</button>
+                <button class="btn btn-primary" onclick="listarCitasBusqueda()">Listar Todas</button>
+                <button class="btn btn-warning" onclick="limpiarBusqueda()">Limpiar</button>
+            </div>
+            <hr>
+            <div class="tabla-container">
+                <table>
+                    <thead><tr><th>ID</th><th>Código</th><th>Paciente</th><th>DNI</th><th>Especialidad</th><th>Médico</th><th>Fecha</th><th>Hora</th><th>Estado</th></tr></thead>
+                    <tbody id="tabla-buscar"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div id="historial" class="panel">
+            <h2 class="title">RF-CIT-18: Historial de Citas del Paciente</h2>
+            <div id="msg-historial"></div>
+            <div class="search-box">
+                <div class="form-group"><label>ID Paciente</label><input type="number" id="hist-id"></div>
+                <div class="form-group" style="justify-content:flex-end;"><button class="btn btn-success" onclick="buscarHistorial()">Ver Historial</button></div>
+            </div>
+            <hr>
+            <div class="tabla-container">
+                <table>
+                    <thead><tr><th>ID</th><th>Código</th><th>Paciente</th><th>DNI</th><th>Especialidad</th><th>Médico</th><th>Fecha</th><th>Hora</th><th>Estado</th></tr></thead>
+                    <tbody id="tabla-historial"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API = 'http://localhost:8080/api';
+
+        function mostrarMsg(seccion, texto, tipo) {
+            const div = document.getElementById('msg-' + seccion);
+            if (div) div.innerHTML = '<div class="msg msg-' + tipo + '">' + texto + '</div>';
+            setTimeout(() => { if (div) div.innerHTML = ''; }, 3500);
+        }
+
+        async function api(url, method, body) {
+            const config = { method, headers: { 'Content-Type': 'application/json' } };
+            if (body) config.body = JSON.stringify(body);
+            const res = await fetch(API + url, config);
+            const data = await res.json();
+            if (!res.ok) throw { data };
+            return data;
+        }
+
+        function mostrarPanel(nombre, btn) {
+            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.getElementById(nombre).classList.add('active');
+            btn.classList.add('active');
+            const loaders = { pacientes: listarPacientes, especialidades: listarEspecialidades, consultorios: listarConsultorios, medicos: listarMedicos, horarios: listarHorarios, citas: listarCitas, agenda: cargarSelectAgenda, buscar: listarCitasBusqueda, historial: () => {} };
+            if (loaders[nombre]) loaders[nombre]();
+        }
+
+        function badgeEstado(e) {
+            const c = { PROGRAMADA: 'blue', CONFIRMADA: 'green', CANCELADA: 'red', ATENDIDA: 'green', NO_ASISTIO: 'gray' };
+            return '<span class="badge badge-' + (c[e] || 'gray') + '">' + e + '</span>';
+        }
+
+        function filaPaciente(p) {
+            return '<tr><td>' + p.id_paciente + '</td><td>' + p.nombre + '</td><td>' + p.apellido + '</td><td>' + p.dni + '</td><td>' + p.telefono + '</td><td>' + p.email + '</td><td><div class="acciones"><button class="btn-editar" onclick="editarPaciente(' + p.id_paciente + ')">Editar</button><button class="btn-danger" onclick="eliminarPaciente(' + p.id_paciente + ')">Eliminar</button></div></td></tr>';
+        }
+
+        function filaEspecialidad(e) {
+            return '<tr><td>' + e.id_especialidad + '</td><td>' + e.nombre + '</td><td>' + e.descripcion + '</td><td><div class="acciones"><button class="btn-editar" onclick="editarEspecialidad(' + e.id_especialidad + ')">Editar</button><button class="btn-danger" onclick="eliminarEspecialidad(' + e.id_especialidad + ')">Eliminar</button></div></td></tr>';
+        }
+
+        function filaConsultorio(c) {
+            return '<tr><td>' + c.id_consultorio + '</td><td>' + c.codigo + '</td><td>' + c.nombre + '</td><td>' + c.piso + '</td><td><div class="acciones"><button class="btn-editar" onclick="editarConsultorio(' + c.id_consultorio + ')">Editar</button><button class="btn-danger" onclick="eliminarConsultorio(' + c.id_consultorio + ')">Eliminar</button></div></td></tr>';
+        }
+
+        function filaMedico(m) {
+            return '<tr><td>' + m.id_medico + '</td><td>' + m.nombre + '</td><td>' + m.apellido + '</td><td>' + m.dni + '</td><td>' + m.telefono + '</td><td>' + (m.especialidad?.nombre || '') + '</td><td><div class="acciones"><button class="btn-editar" onclick="editarMedico(' + m.id_medico + ')">Editar</button><button class="btn-danger" onclick="eliminarMedico(' + m.id_medico + ')">Eliminar</button></div></td></tr>';
+        }
+
+        function filaHorario(h) {
+            return '<tr><td>' + h.id_horario + '</td><td>' + (h.medico?.nombre || '') + ' ' + (h.medico?.apellido || '') + '</td><td>' + (h.especialidad?.nombre || '') + '</td><td>' + h.dia_semana + '</td><td>' + h.hora_inicio + '</td><td>' + h.hora_fin + '</td><td><div class="acciones"><button class="btn-editar" onclick="editarHorario(' + h.id_horario + ')">Editar</button><button class="btn-danger" onclick="eliminarHorario(' + h.id_horario + ')">Eliminar</button></div></td></tr>';
+        }
+
+        function filaCita(c) {
+            return '<tr><td>' + c.id_cita + '</td><td><strong>' + c.codigo + '</strong></td><td>' + (c.paciente?.nombre || '') + ' ' + (c.paciente?.apellido || '') + '</td><td>' + (c.paciente?.dni || '') + '</td><td>' + (c.especialidad?.nombre || '') + '</td><td>' + (c.medico?.nombre || '') + ' ' + (c.medico?.apellido || '') + '</td><td>' + (c.consultorio?.codigo || '') + '</td><td>' + c.fecha + '</td><td>' + c.hora + '</td><td>' + c.tipo_atencion + '</td><td>' + c.motivo + '</td><td>' + badgeEstado(c.estado) + '</td><td><div class="acciones"><button class="btn-editar" onclick="editarCita(' + c.id_cita + ')">Editar</button><button class="btn-danger" onclick="eliminarCita(' + c.id_cita + ')">Eliminar</button></div></td></tr>';
+        }
+
+        function filaCitaBusqueda(c) {
+            return '<tr><td>' + c.id_cita + '</td><td>' + c.codigo + '</td><td>' + (c.paciente?.nombre || '') + ' ' + (c.paciente?.apellido || '') + '</td><td>' + (c.paciente?.dni || '') + '</td><td>' + (c.especialidad?.nombre || '') + '</td><td>' + (c.medico?.nombre || '') + ' ' + (c.medico?.apellido || '') + '</td><td>' + c.fecha + '</td><td>' + c.hora + '</td><td>' + badgeEstado(c.estado) + '</td></tr>';
+        }
+
+        function renderTabla(id, data, func) {
+            const tbody = document.getElementById(id);
+            if (data.length === 0) { tbody.innerHTML = '<tr><td colspan="20" style="text-align:center;color:#9ca3af;padding:20px;">No hay registros</td></tr>'; return; }
+            tbody.innerHTML = data.map(func).join('');
+        }
+
+        function listarPacientes() { api('/pacientes', 'GET').then(d => renderTabla('tabla-pacientes', d, filaPaciente)); }
+        function listarEspecialidades() { api('/especialidades', 'GET').then(d => renderTabla('tabla-especialidades', d, filaEspecialidad)); }
+        function listarConsultorios() { api('/consultorios', 'GET').then(d => renderTabla('tabla-consultorios', d, filaConsultorio)); }
+        function listarMedicos() { api('/medicos', 'GET').then(d => renderTabla('tabla-medicos', d, filaMedico)); cargarSelectMedicos(); }
+        function listarHorarios() { api('/horarios', 'GET').then(d => renderTabla('tabla-horarios', d, filaHorario)); cargarSelectHorarios(); }
+        function listarCitas() { api('/citas', 'GET').then(d => renderTabla('tabla-citas', d, filaCita)); cargarSelectCitas(); }
+        function listarCitasBusqueda() { api('/citas', 'GET').then(d => renderTabla('tabla-buscar', d, filaCitaBusqueda)); }
+
+        async function cargarSelectMedicos() {
+            const esp = await api('/especialidades', 'GET');
+            document.getElementById('m-especialidad').innerHTML = '<option value="">Seleccionar...</option>' + esp.map(e => '<option value="' + e.id_especialidad + '">' + e.nombre + '</option>').join('');
+        }
+
+        async function cargarSelectHorarios() {
+            const [med, esp] = await Promise.all([api('/medicos', 'GET'), api('/especialidades', 'GET')]);
+            document.getElementById('h-medico').innerHTML = '<option value="">Seleccionar médico...</option>' + med.map(m => '<option value="' + m.id_medico + '">' + m.nombre + ' ' + m.apellido + '</option>').join('');
+            document.getElementById('h-especialidad').innerHTML = '<option value="">Seleccionar especialidad...</option>' + esp.map(e => '<option value="' + e.id_especialidad + '">' + e.nombre + '</option>').join('');
+        }
+
+        async function cargarSelectCitas() {
+            const [pac, esp, med, con] = await Promise.all([api('/pacientes', 'GET'), api('/especialidades', 'GET'), api('/medicos', 'GET'), api('/consultorios', 'GET')]);
+            document.getElementById('ci-paciente').innerHTML = '<option value="">Seleccionar...</option>' + pac.map(p => '<option value="' + p.id_paciente + '">' + p.nombre + ' ' + p.apellido + '</option>').join('');
+            document.getElementById('ci-especialidad').innerHTML = '<option value="">Seleccionar...</option>' + esp.map(e => '<option value="' + e.id_especialidad + '">' + e.nombre + '</option>').join('');
+            document.getElementById('ci-medico').innerHTML = '<option value="">Seleccionar...</option>' + med.map(m => '<option value="' + m.id_medico + '">' + m.nombre + ' ' + m.apellido + '</option>').join('');
+            document.getElementById('ci-consultorio').innerHTML = '<option value="">Seleccionar...</option>' + con.map(c => '<option value="' + c.id_consultorio + '">' + c.codigo + ' - ' + c.nombre + '</option>').join('');
+        }
+
+        async function cargarSelectAgenda() {
+            const med = await api('/medicos', 'GET');
+            document.getElementById('a-medico').innerHTML = '<option value="">Seleccionar médico...</option>' + med.map(m => '<option value="' + m.id_medico + '">' + m.nombre + ' ' + m.apellido + '</option>').join('');
+        }
+
+        function guardarPaciente() {
+            const id = document.getElementById('p-id').value;
+            const body = { nombre: document.getElementById('p-nombre').value, apellido: document.getElementById('p-apellido').value, dni: document.getElementById('p-dni').value, telefono: document.getElementById('p-telefono').value, email: document.getElementById('p-email').value };
+            (id ? api('/pacientes/' + id, 'PUT', body) : api('/pacientes', 'POST', body)).then(() => { mostrarMsg('pacientes', id ? 'Actualizado' : 'Registrado', 'success'); limpiarPaciente(); listarPacientes(); }).catch(e => mostrarMsg('pacientes', e.data?.error || 'Error', 'error'));
+        }
+        function editarPaciente(id) { api('/pacientes/' + id, 'GET').then(p => { document.getElementById('p-id').value = p.id_paciente; document.getElementById('p-nombre').value = p.nombre; document.getElementById('p-apellido').value = p.apellido; document.getElementById('p-dni').value = p.dni; document.getElementById('p-telefono').value = p.telefono; document.getElementById('p-email').value = p.email; }); }
+        function eliminarPaciente(id) { if (confirm('¿Eliminar?')) api('/pacientes/' + id, 'DELETE').then(() => { mostrarMsg('pacientes', 'Eliminado', 'success'); listarPacientes(); }); }
+        function limpiarPaciente() { ['p-id', 'p-nombre', 'p-apellido', 'p-dni', 'p-telefono', 'p-email'].forEach(i => document.getElementById(i).value = ''); }
+
+        function guardarEspecialidad() {
+            const id = document.getElementById('e-id').value;
+            const body = { nombre: document.getElementById('e-nombre').value, descripcion: document.getElementById('e-descripcion').value };
+            (id ? api('/especialidades/' + id, 'PUT', body) : api('/especialidades', 'POST', body)).then(() => { mostrarMsg('especialidades', id ? 'Actualizada' : 'Registrada', 'success'); limpiarEspecialidad(); listarEspecialidades(); }).catch(e => mostrarMsg('especialidades', e.data?.error || 'Error', 'error'));
+        }
+        function editarEspecialidad(id) { api('/especialidades/' + id, 'GET').then(e => { document.getElementById('e-id').value = e.id_especialidad; document.getElementById('e-nombre').value = e.nombre; document.getElementById('e-descripcion').value = e.descripcion; }); }
+        function eliminarEspecialidad(id) { if (confirm('¿Eliminar?')) api('/especialidades/' + id, 'DELETE').then(() => { mostrarMsg('especialidades', 'Eliminada', 'success'); listarEspecialidades(); }); }
+        function limpiarEspecialidad() { ['e-id', 'e-nombre', 'e-descripcion'].forEach(i => document.getElementById(i).value = ''); }
+
+        function guardarConsultorio() {
+            const id = document.getElementById('c-id').value;
+            const body = { codigo: document.getElementById('c-codigo').value, nombre: document.getElementById('c-nombre').value, piso: document.getElementById('c-piso').value };
+            (id ? api('/consultorios/' + id, 'PUT', body) : api('/consultorios', 'POST', body)).then(() => { mostrarMsg('consultorios', id ? 'Actualizado' : 'Registrado', 'success'); limpiarConsultorio(); listarConsultorios(); }).catch(e => mostrarMsg('consultorios', e.data?.error || 'Error', 'error'));
+        }
+        function editarConsultorio(id) { api('/consultorios/' + id, 'GET').then(c => { document.getElementById('c-id').value = c.id_consultorio; document.getElementById('c-codigo').value = c.codigo; document.getElementById('c-nombre').value = c.nombre; document.getElementById('c-piso').value = c.piso; }); }
+        function eliminarConsultorio(id) { if (confirm('¿Eliminar?')) api('/consultorios/' + id, 'DELETE').then(() => { mostrarMsg('consultorios', 'Eliminado', 'success'); listarConsultorios(); }); }
+        function limpiarConsultorio() { ['c-id', 'c-codigo', 'c-nombre', 'c-piso'].forEach(i => document.getElementById(i).value = ''); }
+
+        function guardarMedico() {
+            const id = document.getElementById('m-id').value;
+            const body = { nombre: document.getElementById('m-nombre').value, apellido: document.getElementById('m-apellido').value, dni: document.getElementById('m-dni').value, telefono: document.getElementById('m-telefono').value, especialidad: { id_especialidad: parseInt(document.getElementById('m-especialidad').value) } };
+            (id ? api('/medicos/' + id, 'PUT', body) : api('/medicos', 'POST', body)).then(() => { mostrarMsg('medicos', id ? 'Actualizado' : 'Registrado', 'success'); limpiarMedico(); listarMedicos(); }).catch(e => mostrarMsg('medicos', e.data?.error || 'Error', 'error'));
+        }
+        function editarMedico(id) { api('/medicos/' + id, 'GET').then(async m => { document.getElementById('m-id').value = m.id_medico; document.getElementById('m-nombre').value = m.nombre; document.getElementById('m-apellido').value = m.apellido; document.getElementById('m-dni').value = m.dni; document.getElementById('m-telefono').value = m.telefono; await cargarSelectMedicos(); document.getElementById('m-especialidad').value = m.especialidad?.id_especialidad || ''; }); }
+        function eliminarMedico(id) { if (confirm('¿Eliminar?')) api('/medicos/' + id, 'DELETE').then(() => { mostrarMsg('medicos', 'Eliminado', 'success'); listarMedicos(); }); }
+        function limpiarMedico() { ['m-id', 'm-nombre', 'm-apellido', 'm-dni', 'm-telefono', 'm-especialidad'].forEach(i => document.getElementById(i).value = ''); }
+
+        function guardarHorario() {
+            const id = document.getElementById('h-id').value;
+            const body = { medico: { id_medico: parseInt(document.getElementById('h-medico').value) }, especialidad: { id_especialidad: parseInt(document.getElementById('h-especialidad').value) }, dia_semana: document.getElementById('h-dia').value, hora_inicio: document.getElementById('h-inicio').value + ':00', hora_fin: document.getElementById('h-fin').value + ':00' };
+            (id ? api('/horarios/' + id, 'PUT', body) : api('/horarios', 'POST', body)).then(() => { mostrarMsg('horarios', id ? 'Actualizado' : 'Registrado', 'success'); limpiarHorario(); listarHorarios(); }).catch(e => mostrarMsg('horarios', e.data?.error || 'Error', 'error'));
+        }
+        function editarHorario(id) { api('/horarios/' + id, 'GET').then(async h => { document.getElementById('h-id').value = h.id_horario; document.getElementById('h-dia').value = h.dia_semana; document.getElementById('h-inicio').value = h.hora_inicio?.substring(0, 5); document.getElementById('h-fin').value = h.hora_fin?.substring(0, 5); await cargarSelectHorarios(); document.getElementById('h-medico').value = h.medico?.id_medico || ''; document.getElementById('h-especialidad').value = h.especialidad?.id_especialidad || ''; }); }
+        function eliminarHorario(id) { if (confirm('¿Eliminar?')) api('/horarios/' + id, 'DELETE').then(() => { mostrarMsg('horarios', 'Eliminado', 'success'); listarHorarios(); }); }
+        function limpiarHorario() { ['h-id', 'h-medico', 'h-especialidad', 'h-inicio', 'h-fin'].forEach(i => document.getElementById(i).value = ''); document.getElementById('h-dia').value = 'Lunes'; }
+
+        function guardarCita() {
+            const id = document.getElementById('ci-id').value;
+            const body = { paciente: { id_paciente: parseInt(document.getElementById('ci-paciente').value) }, especialidad: { id_especialidad: parseInt(document.getElementById('ci-especialidad').value) }, medico: { id_medico: parseInt(document.getElementById('ci-medico').value) }, consultorio: { id_consultorio: parseInt(document.getElementById('ci-consultorio').value) }, fecha: document.getElementById('ci-fecha').value, hora: document.getElementById('ci-hora').value + ':00', tipo_atencion: document.getElementById('ci-tipo').value, motivo: document.getElementById('ci-motivo').value, observaciones: document.getElementById('ci-observaciones').value, estado: document.getElementById('ci-estado').value };
+            (id ? api('/citas/' + id, 'PUT', body) : api('/citas', 'POST', body)).then(() => { mostrarMsg('citas', id ? 'Cita actualizada' : 'Cita registrada correctamente', 'success'); limpiarCita(); listarCitas(); }).catch(e => mostrarMsg('citas', e.data?.error || 'Error al guardar', 'error'));
+        }
+        function editarCita(id) { api('/citas/' + id, 'GET').then(async c => { document.getElementById('ci-id').value = c.id_cita; document.getElementById('ci-fecha').value = c.fecha; document.getElementById('ci-hora').value = c.hora?.substring(0, 5); document.getElementById('ci-tipo').value = c.tipo_atencion; document.getElementById('ci-motivo').value = c.motivo; document.getElementById('ci-observaciones').value = c.observaciones; document.getElementById('ci-estado').value = c.estado; await cargarSelectCitas(); document.getElementById('ci-paciente').value = c.paciente?.id_paciente || ''; document.getElementById('ci-especialidad').value = c.especialidad?.id_especialidad || ''; document.getElementById('ci-medico').value = c.medico?.id_medico || ''; document.getElementById('ci-consultorio').value = c.consultorio?.id_consultorio || ''; }); }
+        function eliminarCita(id) { if (confirm('¿Eliminar cita?')) api('/citas/' + id, 'DELETE').then(() => { mostrarMsg('citas', 'Cita eliminada', 'success'); listarCitas(); }); }
+        function limpiarCita() { ['ci-id', 'ci-paciente', 'ci-especialidad', 'ci-medico', 'ci-consultorio', 'ci-fecha', 'ci-hora', 'ci-motivo', 'ci-observaciones'].forEach(i => document.getElementById(i).value = ''); document.getElementById('ci-tipo').value = 'Consulta General'; document.getElementById('ci-estado').value = 'PROGRAMADA'; }
+
+        function buscarAgenda() {
+            const medId = document.getElementById('a-medico').value;
+            const fecha = document.getElementById('a-fecha').value;
+            if (!medId || !fecha) { mostrarMsg('agenda', 'Seleccione médico y fecha', 'error'); return; }
+            api('/citas/agenda/' + medId + '?fecha=' + fecha, 'GET').then(d => renderTabla('tabla-agenda', d, filaCitaBusqueda));
+        }
+
+        function buscarCitas() {
+            const codigo = document.getElementById('bus-codigo').value;
+            const dni = document.getElementById('bus-dni').value;
+            const medico = document.getElementById('bus-medico').value;
+            const esp = document.getElementById('bus-especialidad').value;
+            const estado = document.getElementById('bus-estado').value;
+            let url = null;
+            if (codigo) url = '/citas/buscar/codigo/' + codigo;
+            else if (dni) url = '/citas/buscar/dni/' + dni;
+            else if (medico) url = '/citas/buscar/medico/' + medico;
+            else if (esp) url = '/citas/buscar/especialidad/' + esp;
+            else if (estado) url = '/citas/buscar/estado/' + estado;
+            if (url) api(url, 'GET').then(d => renderTabla('tabla-buscar', d, filaCitaBusqueda));
+            else mostrarMsg('buscar', 'Ingrese un criterio', 'error');
+        }
+
+        function limpiarBusqueda() { ['bus-codigo', 'bus-dni', 'bus-medico', 'bus-especialidad', 'bus-estado'].forEach(i => document.getElementById(i).value = ''); listarCitasBusqueda(); }
+
+        function buscarHistorial() {
+            const id = document.getElementById('hist-id').value;
+            if (!id) { mostrarMsg('historial', 'Ingrese ID del paciente', 'error'); return; }
+            api('/citas/historial/' + id, 'GET').then(d => renderTabla('tabla-historial', d, filaCitaBusqueda));
+        }
+
+        listarPacientes();
+    </script>
+</body>
+</html>
