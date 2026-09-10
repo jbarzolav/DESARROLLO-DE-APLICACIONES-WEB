@@ -13,14 +13,6 @@ API REST desarrollada en Spring Boot para la gestión de citas médicas. Permite
 - **RF-CIT-17:** Buscar citas por código, DNI, médico, especialidad o estado
 - **RF-CIT-18:** Consultar historial de citas de un paciente
 
-## Tecnologías
-
-- Java 17
-- Spring Boot 3.4.5
-- Spring Data JPA
-- MySQL (XAMPP)
-- HTML, CSS, JavaScript
-
 ## Cómo Ejecutar
 
 1. Iniciar XAMPP y crear la base de datos:
