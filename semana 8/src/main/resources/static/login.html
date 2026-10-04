@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Iniciar Sesion - Sistema de Citas Medicas</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Segoe UI', sans-serif; background: linear-gradient(135deg, #1e40af, #7c3aed); min-height: 100vh; display: flex; align-items: center; justify-content: center; }
+        .login-card { background: white; border-radius: 14px; padding: 34px; width: 360px; box-shadow: 0 20px 50px rgba(0,0,0,0.25); }
+        .login-card h1 { font-size: 19px; color: #1f2937; text-align: center; margin-bottom: 6px; }
+        .login-card p { font-size: 12px; color: #6b7280; text-align: center; margin-bottom: 22px; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+        .form-group label { font-weight: 600; font-size: 12px; color: #374151; }
+        .form-group input { padding: 11px 12px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px; }
+        .form-group input:focus { outline: none; border-color: #1e40af; box-shadow: 0 0 0 3px rgba(30,64,175,0.12); }
+        .btn-login { width: 100%; padding: 12px; border: none; border-radius: 8px; background: #1e40af; color: white; font-size: 14px; font-weight: 700; cursor: pointer; margin-top: 6px; }
+        .btn-login:hover { background: #1d4ed8; }
+        .btn-login:disabled { background: #9ca3af; cursor: not-allowed; }
+        .msg { padding: 10px 12px; border-radius: 8px; margin-bottom: 14px; font-size: 13px; font-weight: 500; display: none; }
+        .msg-error { background: #fef2f2; color: #991b1b; border: 1px solid #fecaca; display: block; }
+        .ayuda { margin-top: 16px; font-size: 11px; color: #9ca3af; text-align: center; line-height: 1.7; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <h1>MedICitas</h1>
+        <p>Inicio de sesion con control de acceso por rol</p>
+        <div id="msg-login" class="msg"></div>
+        <form id="form-login">
+            <div class="form-group">
+                <label>Usuario</label>
+                <input type="text" id="username" autocomplete="username" required>
+            </div>
+            <div class="form-group">
+                <label>Contrasena</label>
+                <input type="password" id="password" autocomplete="current-password" required>
+            </div>
+            <button type="submit" class="btn-login" id="btn-login">Ingresar</button>
+        </form>
+        <div class="ayuda">
+            Usuarios de prueba:<br>
+            admin / admin123 (ADMINISTRADOR)<br>
+            medico / medico123 (MÉDICO)<br>
+            recepcionista / recep123 (RECEPCIONISTA)
+        </div>
+    </div>
+
+    <script>
+        const API = 'http://localhost:8080/api';
+        const msg = document.getElementById('msg-login');
+
+        // si ya tiene sesion abierta, entra directo al sistema
+        fetch(API + '/auth/me').then(r => { if (r.ok) window.location.href = 'index.html'; });
+
+        document.getElementById('form-login').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            msg.className = 'msg';
+            document.getElementById('btn-login').disabled = true;
+            try {
+                const res = await fetch(API + '/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        username: document.getElementById('username').value.trim(),
+                        password: document.getElementById('password').value
+                    })
+                });
+                const data = await res.json();
+                if (!res.ok) {
+                    msg.className = 'msg msg-error';
+                    msg.textContent = data.error || 'Error de autenticacion';
+                    document.getElementById('btn-login').disabled = false;
+                    return;
+                }
+                // Pregunta 5: redireccion segun el rol autenticado
+                window.location.href = data.redirect || 'index.html';
+            } catch (err) {
+                msg.className = 'msg msg-error';
+                msg.textContent = 'No se pudo conectar con el servidor';
+                document.getElementById('btn-login').disabled = false;
+            }
+        });
+    </script>
+</body>
+</html>
